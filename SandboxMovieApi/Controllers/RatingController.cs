@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SandboxMovieApi.Entities;
+using SandboxMovieApi.Infrastructure.Persistance;
 
 namespace SandboxMovieApi.Controllers
 {
@@ -10,14 +11,10 @@ namespace SandboxMovieApi.Controllers
         [HttpGet("Ratings")]
         public ActionResult<IEnumerable<Rating>> GetRating()
         {
-            var rating = new Rating();
-            rating.Id = 1;
-            rating.Name = "Test";
+            var ratingDb = new AppDbContext();
+            var ratingsInfo = ratingDb.Rating.ToList();
 
-            var ratingList = new List<Rating>();
-            ratingList.Add(rating);
-
-            return Ok(ratingList);
+            return Ok(ratingsInfo);
         }
 
         /// <summary>
@@ -32,7 +29,7 @@ namespace SandboxMovieApi.Controllers
         {
             var rating = new Rating();
             rating.Id = 1;
-            rating.Name = "Test";
+            rating.Description = "Test";
 
 
             if (ratingId != rating.Id)
