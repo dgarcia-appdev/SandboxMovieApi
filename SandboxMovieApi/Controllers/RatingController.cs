@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 using SandboxMovieApi.Entities;
+using SandboxMovieApi.Infrastructure;
 using SandboxMovieApi.Infrastructure.Persistance;
 
 namespace SandboxMovieApi.Controllers
@@ -8,11 +10,17 @@ namespace SandboxMovieApi.Controllers
     [ApiController]
     public class RatingController : ControllerBase
     {
+        private readonly IRepository<Rating> _ratingRepo;
+
+        public RatingController(IRepository<Rating> ratingRepo)
+        {
+            _ratingRepo = ratingRepo;
+        }
+
         [HttpGet("Ratings")]
         public ActionResult<IEnumerable<Rating>> GetRating()
         {
-            var ratingDb = new AppDbContext();
-            var ratingsInfo = ratingDb.Rating.ToList();
+            var ratingsInfo = _ratingRepo.Get();
 
             return Ok(ratingsInfo);
         }

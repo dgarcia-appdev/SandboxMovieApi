@@ -10,14 +10,10 @@ namespace SandboxMovieApi.Infrastructure.Persistance
     {
         public DbSet<Rating> Rating { get; set; }
 
-
-        /// <summary>
-        /// Configuring the DbContext
-        /// </summary>
-        /// <param name="optionsBuilder"></param>
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=MovieDb;Integrated Security=True;TrustServerCertificate=true");
+        public AppDbContext(DbContextOptions options) 
+            : base(options)
+        { 
         }
+        
     }
 }
