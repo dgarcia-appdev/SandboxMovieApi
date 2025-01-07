@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SandboxMovieApi.Entities;
+using SandboxMovieApi.Infrastructure.Entities;
 
 namespace SandboxMovieApi.Infrastructure.Persistance
 {

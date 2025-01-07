@@ -1,5 +1,6 @@
-﻿using SandboxMovieApi.Entities;
+﻿using SandboxMovieApi.Infrastructure.Entities;
 using SandboxMovieApi.Infrastructure.Persistance;
+using System.Linq.Expressions;
 
 namespace SandboxMovieApi.Infrastructure
 {
@@ -14,36 +15,46 @@ namespace SandboxMovieApi.Infrastructure
 
         public void Add(Rating rating)
         {
-            throw new NotImplementedException();
+            var ratingDb = _dbContext.Rating.Add(rating);
+            _dbContext.SaveChanges();            
         }
 
-        public void Delete(int id)
+        public int Delete(Rating rating)
         {
-            throw new NotImplementedException();
+            _dbContext.Remove(rating);
+            return _dbContext.SaveChanges();
         }
 
-        public IEnumerable<Rating> Get()
+        public IEnumerable<Rating> Get(Expression<Func<Rating, bool>> filter = null)
         {
+            if (filter != null)
+            {
+                return _dbContext.Rating.Where(filter).ToList();
+            }
+
+
             return _dbContext.Rating.ToList();
         }
 
-        public Rating Get(int id)
-        {
-            throw new NotImplementedException();
+        public Rating? Get(byte id)
+        {            
+            var rating = _dbContext.Rating.Find(id);
+            return rating;
         }
 
-        public void Update(Rating rating)
+        public int Update(Rating rating)
         {
-            throw new NotImplementedException();
+            _dbContext.Update(rating);
+            return _dbContext.SaveChanges();
         }
     }
 
     public interface IRepository<T>
     {
-        public IEnumerable<T> Get();
-        public T Get(int id);
+        public IEnumerable<T> Get(Expression<Func<Rating, bool>> filter = null);
+        public T Get(byte id);
         public void Add(T rating);
-        public void Update(T rating);
-        public void Delete(int id);
+        public int Update(T rating);
+        public int Delete(Rating rating);
     }
 }

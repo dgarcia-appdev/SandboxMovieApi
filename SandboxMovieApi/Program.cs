@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using SandboxMovieApi.Entities;
 using SandboxMovieApi.Infrastructure;
+using SandboxMovieApi.Infrastructure.Entities;
 using SandboxMovieApi.Infrastructure.Persistance;
 using System.Reflection;
 

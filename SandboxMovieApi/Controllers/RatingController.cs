@@ -1,29 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
-using SandboxMovieApi.Entities;
 using SandboxMovieApi.Infrastructure;
-using SandboxMovieApi.Infrastructure.Persistance;
+using SandboxMovieApi.Infrastructure.Entities;
+using SandboxMovieApi.Models;
 
 namespace SandboxMovieApi.Controllers
 {
+    /// <summary>
+    /// Rating Controller
+    /// </summary>
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController]   
     public class RatingController : ControllerBase
     {
         private readonly IRepository<Rating> _ratingRepo;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="ratingRepo"></param>
         public RatingController(IRepository<Rating> ratingRepo)
         {
             _ratingRepo = ratingRepo;
         }
 
+        /// <summary>
+        /// Retrieves all Ratings.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("Ratings")]
-        public ActionResult<IEnumerable<Rating>> GetRating()
-        {
-            var ratingsInfo = _ratingRepo.Get();
-
-            return Ok(ratingsInfo);
-        }
+        public ActionResult<IEnumerable<Rating>> GetRating() => Ok(_ratingRepo.Get());
 
         /// <summary>
         /// Retrieves a Rating.
@@ -35,17 +40,96 @@ namespace SandboxMovieApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<Rating> GetRatingById(int ratingId)
         {
-            var rating = new Rating();
-            rating.Id = 1;
-            rating.Description = "Test";
-
-
-            if (ratingId != rating.Id)
+            var rating = _ratingRepo.Get((byte)ratingId);
+            if (rating == null)
             {
-                return NotFound("Could not find movie");
+                return NotFound();
             }
 
             return Ok(rating);
+        }
+
+        /// <summary>
+        /// Adds a new Rating.
+        /// </summary>
+        /// <param name="rating"></param>
+        /// <response code="201">Returns the new Rating</response>        
+        /// <response>code="400">If the Rating already exist</response>
+        [HttpPost("Rating")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<Rating> PostRating(UpsertRatingDTO rating)
+        {
+            var ratingsDb = _ratingRepo.Get(r => r.Description == rating.Description);            
+            if (ratingsDb.Count() > 0) 
+            {
+                return BadRequest("Rating already exist");
+            }
+
+            var newRating = new Rating
+            {
+                Description = rating.Description
+            };
+
+            _ratingRepo.Add(newRating);
+            return CreatedAtAction("Ratings", new { id = newRating.Id }, rating);
+        }
+
+        /// <summary>
+        /// Update a Rating
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("Rating/{id}")]
+        public ActionResult<Rating> PutRating(int id, UpsertRatingDTO rating)
+        {
+            try
+            {
+                var ratingDb = _ratingRepo.Get((byte)id);
+                if (ratingDb == null)
+                {
+                    return NotFound();
+                }
+
+                ratingDb.Description = rating.Description;
+                var numberOfUpdates = _ratingRepo.Update(ratingDb);
+
+                if (numberOfUpdates == 0)
+                {
+                    return BadRequest("Error Occured: No Records updated");
+                }
+
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest("Error Occured: Contact Support 1-800-idontcare if issue persist");                
+            }
+        }
+
+        [HttpDelete]
+        public ActionResult<Rating> DeleteRating(int id)
+        {
+            try 
+            {
+                var ratingDb = _ratingRepo.Get((byte)id);
+                if (ratingDb == null)
+                {
+                    return NotFound();
+                }
+
+                var numberOfUpdates = _ratingRepo.Delete(ratingDb);
+
+                if (numberOfUpdates == 0)
+                {
+                    return BadRequest("Error Occured: No Records updated");
+                }
+
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest("Error Occured: Contact Support 1-800-idontcare if issue persist");
+            }
         }
     }
 }
