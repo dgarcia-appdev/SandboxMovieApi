@@ -1,7 +1,8 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SandboxMovieApi.Infrastructure;
 using SandboxMovieApi.Infrastructure.Persistance;
 using System.Reflection;
+using SandboxMovieApi.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 

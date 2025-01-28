@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SandboxMovieApi.Infrastructure.Persistance;
 using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace SandboxMovieApi.Infrastructure
 {
@@ -27,15 +28,23 @@ namespace SandboxMovieApi.Infrastructure
             return _dbContext.SaveChanges();
         }
 
-        public IEnumerable<T> Get(Expression<Func<T, bool>> filter = null)
+        public IEnumerable<T> Get(Expression<Func<T, bool>> filter = null, string includeProperties = "")
         {
+            IQueryable<T> query = _dbSet;
+
             if (filter != null)
             {
                 return _dbSet.Where(filter).ToList();
             }
 
 
-            return _dbSet.ToList();
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+
+            return query.ToList();
         }
 
         public T? Get(object id)
@@ -52,7 +61,7 @@ namespace SandboxMovieApi.Infrastructure
 
     public interface IRepository<T>
     {
-        public IEnumerable<T> Get(Expression<Func<T, bool>> filter = null);
+        public IEnumerable<T> Get(Expression<Func<T, bool>> filter = null, string includeProperties = "");
         public T Get(object id);
         public void Add(T rating);
         public int Update(T rating);

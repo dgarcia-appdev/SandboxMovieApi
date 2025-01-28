@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata;
 using SandboxMovieApi.Infrastructure;
 using SandboxMovieApi.Infrastructure.Entities;
 using SandboxMovieApi.Models;
@@ -25,7 +26,10 @@ namespace SandboxMovieApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("Genre")]
-        public ActionResult<IEnumerable<Genre>> GetGenre() => Ok(_genreRepo.Get());
+        public ActionResult<IEnumerable<GenreDTO>> GetGenre() => Ok(_genreRepo.Get().Select(g => new GenreDTO {
+            Id = g.Id,
+            Description = g.Description
+        }));
 
         /// <summary>
         /// Retrieves a Genre.
@@ -35,15 +39,18 @@ namespace SandboxMovieApi.Controllers
         [HttpGet("Genre/{genreId}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<Genre> GetGenreById(int genreId)
+        public ActionResult<GenreDTO> GetGenreById(int genreId)
         {
-            var genre = _genreRepo.Get(genreId);
+            var genre = _genreRepo.Get((short)genreId);
             if (genre == null)
             {
                 return NotFound();
             }
 
-            return Ok(genre);
+            return Ok(new GenreDTO {
+                Id = genre.Id,
+                Description = genre.Description
+            });
         }
 
         /// <summary>
@@ -55,7 +62,7 @@ namespace SandboxMovieApi.Controllers
         [HttpPost("Genre")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Genre> PostGenre(UpsertGenreDTO genre)
+        public ActionResult<GenreDTO> PostGenre(UpsertGenreDTO genre)
         {
             var genreDb = _genreRepo.Get(r => r.Description == genre.Description);
             if (genreDb.Count() > 0)
@@ -69,7 +76,11 @@ namespace SandboxMovieApi.Controllers
             };
 
             _genreRepo.Add(newGenre);
-            return CreatedAtAction("Genre", new { id = newGenre.Id }, genre);
+            return CreatedAtAction(nameof(GetGenreById), new { genreId = newGenre.Id }, new GenreDTO
+            {
+                Id = newGenre.Id,
+                Description = newGenre.Description
+            });
         }
 
         /// <summary>
@@ -77,7 +88,7 @@ namespace SandboxMovieApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut("Genre/{id}")]
-        public ActionResult<Genre> PutGenre(int id, UpsertGenreDTO genre)
+        public ActionResult PutGenre(int id, UpsertGenreDTO genre)
         {
             try
             {
