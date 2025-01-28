@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using SandboxMovieApi.Infrastructure;
-using SandboxMovieApi.Infrastructure.Entities;
 using SandboxMovieApi.Infrastructure.Persistance;
 using System.Reflection;
 
@@ -10,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddScoped<IRepository<Rating>, RatingRepository>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 // Add services for Entity Framework Core
 builder.Services.AddDbContext<AppDbContext>(optionsBuilder =>

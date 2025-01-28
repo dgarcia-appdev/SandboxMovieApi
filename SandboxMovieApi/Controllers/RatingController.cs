@@ -72,7 +72,7 @@ namespace SandboxMovieApi.Controllers
             };
 
             _ratingRepo.Add(newRating);
-            return CreatedAtAction("Ratings", new { id = newRating.Id }, rating);
+            return CreatedAtAction(nameof(GetRatingById), new { ratingId = newRating.Id }, newRating);
         }
 
         /// <summary>
@@ -106,6 +106,11 @@ namespace SandboxMovieApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Delete a Rating
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete]
         public ActionResult<Rating> DeleteRating(int id)
         {

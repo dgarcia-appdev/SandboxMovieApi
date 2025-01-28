@@ -1,60 +1,61 @@
-﻿using SandboxMovieApi.Infrastructure.Entities;
+﻿using Microsoft.EntityFrameworkCore;
 using SandboxMovieApi.Infrastructure.Persistance;
 using System.Linq.Expressions;
 
 namespace SandboxMovieApi.Infrastructure
 {
-    public class RatingRepository : IRepository<Rating>
+    public class Repository<T> : IRepository<T> where T : class 
     {
         private readonly AppDbContext _dbContext;
+        private readonly DbSet<T> _dbSet;
 
-        public RatingRepository(AppDbContext dbContext)
+        public Repository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
+            _dbSet = dbContext.Set<T>();
         }
 
-        public void Add(Rating rating)
+        public void Add(T entity)
         {
-            var ratingDb = _dbContext.Rating.Add(rating);
+            var ratingDb = _dbSet.Add(entity);
             _dbContext.SaveChanges();            
         }
 
-        public int Delete(Rating rating)
+        public int Delete(T entity)
         {
-            _dbContext.Remove(rating);
+            _dbContext.Remove(entity);
             return _dbContext.SaveChanges();
         }
 
-        public IEnumerable<Rating> Get(Expression<Func<Rating, bool>> filter = null)
+        public IEnumerable<T> Get(Expression<Func<T, bool>> filter = null)
         {
             if (filter != null)
             {
-                return _dbContext.Rating.Where(filter).ToList();
+                return _dbSet.Where(filter).ToList();
             }
 
 
-            return _dbContext.Rating.ToList();
+            return _dbSet.ToList();
         }
 
-        public Rating? Get(byte id)
+        public T? Get(object id)
         {            
-            var rating = _dbContext.Rating.Find(id);
-            return rating;
+            return _dbSet.Find(id);            
         }
 
-        public int Update(Rating rating)
+        public int Update(T rating)
         {
-            _dbContext.Update(rating);
+            _dbSet.Update(rating);
             return _dbContext.SaveChanges();
         }
     }
 
     public interface IRepository<T>
     {
-        public IEnumerable<T> Get(Expression<Func<Rating, bool>> filter = null);
-        public T Get(byte id);
+        public IEnumerable<T> Get(Expression<Func<T, bool>> filter = null);
+        public T Get(object id);
         public void Add(T rating);
         public int Update(T rating);
-        public int Delete(Rating rating);
+        public int Delete(T rating);
     }
 }
