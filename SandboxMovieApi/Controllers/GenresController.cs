@@ -25,7 +25,7 @@ namespace SandboxMovieApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("Genre")]
-        public ActionResult<IEnumerable<Genre>> GetRating() => Ok(_genreRepo.Get());
+        public ActionResult<IEnumerable<Genre>> GetGenre() => Ok(_genreRepo.Get());
 
         /// <summary>
         /// Retrieves a Genre.
@@ -49,7 +49,7 @@ namespace SandboxMovieApi.Controllers
         /// <summary>
         /// Adds a new Genre.
         /// </summary>
-        /// <param name="rating"></param>
+        /// <param name="genre"></param>
         /// <response code="201">Returns the new genre</response>        
         /// <response>code="400">If the genre already exist</response>
         [HttpPost("Genre")]
@@ -109,7 +109,7 @@ namespace SandboxMovieApi.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete]
-        public ActionResult<Genre> DeleteRating(int id)
+        public ActionResult<Genre> DeleteGenre(int id)
         {
             try
             {
