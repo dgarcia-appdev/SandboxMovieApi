@@ -1,5 +1,4 @@
-﻿
-namespace SandboxMovieApi.Infrastructure.Entities
+﻿namespace SandboxMovieApi.Infrastructure.Entities
 {
     public class Movie
     {
